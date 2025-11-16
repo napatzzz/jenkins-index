@@ -6,7 +6,9 @@ pipeline {
         stage('Build only PR to production') {
             when {
                 allOf {
-                    environment name: 'CHANGE_ID', value: '.+' 
+
+                    environment name: 'CHANGE_ID', value: '.+' // ต้องเป็น PR
+
                     environment name: 'CHANGE_TARGET', value: 'production'
                     environment name: 'CHANGE_BRANCH', value: 'dev'
                 }
