@@ -18,32 +18,37 @@ pipeline {
 
         stage('Pull Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/napatzzz/jenkins-index.git'
-            }
-        }
-
-        stage('Cleanup Docker') {
-            steps {
-                sh '''
-                    echo "Stopping and removing containers..."
-                    docker-compose down --remove-orphans || true
-
-                    echo "Removing all dangling images..."
-                    docker image prune -af || true
-
-                    echo "Removing unused volumes..."
-                    docker volume prune -f || true
-
-                    echo "Removing unused networks..."
-                    docker network prune -f || true
-                '''
+                git branch: 'dev', url: 'https://github.com/napatzzz/jenkins-index.git'
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker-compose up -d --build'
+                sh '''
+                    echo "=== Stopping existing containers ==="
+                    docker-compose down --remove-orphans --volumes || true
+                    
+                    echo "=== Building and starting new containers ==="
+                    docker-compose up -d --build --force-recreate
+                    
+                    echo "=== Verifying deployment ==="
+                    docker-compose ps
+                    
+                    echo "=== Cleaning up unused resources ==="
+                    docker image prune -af || true
+                    docker volume prune -f || true
+                '''
             }
+        }
+    }
+    
+    post {
+        success {
+            echo "✅ Deployment successful!"
+        }
+        failure {
+            echo "❌ Deployment failed!"
+            sh 'docker-compose logs --tail=50'
         }
     }
 }
