@@ -29,9 +29,19 @@ pipeline {
                     docker rm -f $(docker ps -aq) || true
                     
                     docker rmi -f $(docker images -q) || true
+
+                    
                 
 
                 '''
+            }
+
+            
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh 'docker-compose up -d --build'
             }
         }
     }
