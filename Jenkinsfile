@@ -38,8 +38,8 @@ pipeline {
                         echo "No running container is using port 80."
                     fi
                 '''
-    }
-}
+            }
+        }
 
         stage('Cleanup Docker') {
             steps {
