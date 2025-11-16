@@ -22,19 +22,31 @@ pipeline {
             }
         }
 
+        stage('Kill Existing Port 80 Containers') {
+            steps {
+                sh '''
+                    echo "Checking for containers using port 80..."
+                    PORT80=$(docker ps --format "{{.ID}} {{.Ports}}" | grep ":80->" | awk '{print $1}')
+
+                    if [ ! -z "$PORT80" ]; then
+                        echo "Found container(s) using port 80:"
+                        echo "$PORT80"
+                        echo "Stopping and removing them..."
+                        docker rm -f $PORT80 || true
+                    else
+                        echo "No container is using port 80."
+                    fi
+                '''
+            }
+        }
+
         stage('Cleanup Docker') {
             steps {
                 sh '''
-                    echo "Stopping and removing containers..."
+                    echo "Running docker-compose cleanup..."
                     docker-compose down --remove-orphans || true
-
-                    echo "Removing all dangling images..."
                     docker image prune -af || true
-
-                    echo "Removing unused volumes..."
                     docker volume prune -f || true
-
-                    echo "Removing unused networks..."
                     docker network prune -f || true
                 '''
             }
