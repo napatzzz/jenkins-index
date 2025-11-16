@@ -30,7 +30,8 @@ pipeline {
                     
                     docker rmi -f $(docker images -q)
                     
-                    docker network rm $(docker network ls -q)
+                   docker network ls -q | grep -vE 'bridge|host|none' | xargs docker network rm
+
                 '''
             }
         }
