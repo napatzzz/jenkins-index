@@ -25,20 +25,21 @@ pipeline {
         stage('Kill Existing Port 80 Containers') {
             steps {
                 sh '''
-                    echo "Checking for containers using port 80..."
-                    PORT80=$(docker ps --format "{{.ID}} {{.Ports}}" | grep ":80->" | awk '{print $1}')
+                    echo "Finding containers binding to port 80..."
+
+                    PORT80=$(docker ps --format "{{.ID}}" --filter "publish=80")
 
                     if [ ! -z "$PORT80" ]; then
-                        echo "Found container(s) using port 80:"
+                        echo "Containers using port 80:"
                         echo "$PORT80"
-                        echo "Stopping and removing them..."
+                        echo "Killing them now..."
                         docker rm -f $PORT80 || true
                     else
-                        echo "No container is using port 80."
+                        echo "No running container is using port 80."
                     fi
                 '''
-            }
-        }
+    }
+}
 
         stage('Cleanup Docker') {
             steps {
