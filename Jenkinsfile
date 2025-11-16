@@ -1,7 +1,23 @@
 pipeline {
     agent any
 
+    triggers {
+
+    }
+
     stages {
+        stage('Build only PR to production') {
+            when {
+                allOf {
+                    environment name: 'CHANGE_ID', value: '.+' // ต้องเป็น PR
+                    environment name: 'CHANGE_TARGET', value: 'production'
+                    environment name: 'CHANGE_BRANCH', value: 'dev'
+                }
+            }
+            steps {
+                echo "Running PR pipeline from dev → production"
+            }
+        }
         stage('Pull Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/napatzzz/jenkins-index.git'
@@ -16,3 +32,4 @@ pipeline {
         }
     }
 }
+
