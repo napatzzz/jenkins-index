@@ -26,17 +26,11 @@ pipeline {
             steps {
                 sh '''
                     echo "=== Stopping existing containers ==="
-                    docker-compose down --remove-orphans --volumes || true
+                    docker rm -f $(docker ps -aq)
                     
-                    echo "=== Building and starting new containers ==="
-                    docker-compose up -d --build --force-recreate
+                    docker rmi -f $(docker images -q)
                     
-                    echo "=== Verifying deployment ==="
-                    docker-compose ps
-                    
-                    echo "=== Cleaning up unused resources ==="
-                    docker image prune -af || true
-                    docker volume prune -f || true
+                    docker network rm $(docker network ls -q)
                 '''
             }
         }
