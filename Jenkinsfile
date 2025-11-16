@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Clean with Docker Compose') {
             steps {
                 sh '''
                     echo "=== Stopping existing containers ==="
