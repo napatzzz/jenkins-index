@@ -22,16 +22,26 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Clean with Docker Compose') {
             steps {
                 sh '''
                     echo "=== Stopping existing containers ==="
                     docker rm -f $(docker ps -aq) || true
                     
                     docker rmi -f $(docker images -q) || true
+
+                    
                 
 
                 '''
+            }
+
+            
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh 'docker-compose up -d --build'
             }
         }
     }
